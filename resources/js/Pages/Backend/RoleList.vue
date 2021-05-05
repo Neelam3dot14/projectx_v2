@@ -2,22 +2,26 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Manage Backend User
+                Manage Backend Roles
             </h2>
         </template>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg px-4 py-4">
-                {{ $page.props.success }}
-                   <inertia-link :href="route('user.create')">
-                        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">Create New User</button>
-                    </inertia-link>
+                    <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md my-3" role="alert" v-if="$page.props.flash.message">
+                      <div class="flex">
+                        <div>
+                          <p class="text-sm">{{ $page.props.flash.message }}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <button @click="openModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">Create New Roles</button>
+                    
                     <table class="table-fixed w-full">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="px-4 py-2 w-20">User ID.</th>
+                                <th class="px-4 py-2 w-20">ID</th>
                                 <th class="px-4 py-2">Name</th>
-                                <th class="px-4 py-2">Email</th>
                                 <th class="px-4 py-2">Created At</th>
                                 <th class="px-4 py-2">Action</th>
                             </tr>
@@ -26,7 +30,6 @@
                             <tr v-for="row in data">
                                 <td class="border px-4 py-2">{{ row.id }}</td>
                                 <td class="border px-4 py-2">{{ row.name }}</td>
-                                <td class="border px-4 py-2">{{ row.email }}</td>
                                 <td class="border px-4 py-2">{{ row.created_at }}</td>
                                 <td class="border px-4 py-2">
                                     <button @click="edit(row)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit</button>
@@ -51,10 +54,19 @@
                                     <jet-label for="name" value="Name" />
                                     <jet-input id="name" type="text" class="mt-1 block w-full" v-model="form.name" required autofocus autocomplete="name" />
                                 </div>
-                                <div class="mt-4">
-                                        <jet-label for="email" value="Email" />
-                                        <jet-input id="email" type="email" class="mt-1 block w-full" v-model="form.email" required />
+                                <div>
+                                    <jet-label for="permission-list" value="Permission List" />
+                                    <select v-model="form.permission" required>
+                                         <option>
+                                            Profile
+                                        </option>
+
+                                        <option>
+                                            API Tokens
+                                        </option>
+                                    </select>
                                 </div>
+                                                                
                             </div>
                           </div>
                           <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
@@ -100,49 +112,59 @@
             JetCheckbox,
             JetLabel,
         },
-        props: ['data', 'success'],
+        props: ['data'],
         data() {
             return {
                 editMode: false,
                 isOpen: false,
+                message: false,
                 form: {
                     name: '',
-                    email: '',
                 },
             }
         },
         methods: {
-            openModal: function () {
+            openModal: async function () {
                 this.isOpen = true;
             },
-            closeModal: function () {
+            closeModal: async function () {
                 this.isOpen = false;
-                this.reset();
+                await this.reset();
                 this.editMode=false;
             },
-            reset: function () {
+            reset: async function () {
                 this.form = {
                     name: '',
-                    email: '',
                 }
             },
-            edit: function (data) {
+            async save(data) {
+                await this.$inertia.post('/admin/role/create', data)
+                await this.reset();
+                await this.closeModal();
+                this.editMode = false;
+            },
+            async edit(data) {
                 this.form = Object.assign({}, data);
                 this.editMode = true;
-                this.openModal();
+                await this.openModal();
             },
-            update: function (data) {
+            async update(data) {
                 data._method = 'PUT';
-                this.$inertia.post('/admin/user/' + data.id, data)
-                this.reset();
-                this.closeModal();
+                try{
+                    let response = await this.$inertia.post('/admin/role/' + data.id, data)
+                    //console.log(response);
+                    await this.reset();
+                    await this.closeModal();
+                } catch(e) {
+                    this.message = e.response.data.message || 'There was an issue creating the user.';
+                }
             },
-            deleteRow: function (data) {
+            deleteRow: async function (data) {
                 if (!confirm('Are you sure want to remove?')) return;
                 data._method = 'DELETE';
-                this.$inertia.post('/admin/user/' + data.id, data)
-                this.reset();
-                this.closeModal();
+                await this.$inertia.post('/admin/role/' + data.id, data)
+                await this.reset();
+                await this.closeModal();
             }
         }
     }

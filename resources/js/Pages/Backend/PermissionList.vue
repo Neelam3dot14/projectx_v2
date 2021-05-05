@@ -2,35 +2,41 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Manage Backend User
+                Manage Backend Permission
+                <inertia-link :href="route('backend.role.list')" class="hover:text-gray-900">
+                    Role Management
+                </inertia-link>
             </h2>
         </template>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg px-4 py-4">
-                {{ $page.props.success }}
-                   <inertia-link :href="route('user.create')">
-                        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">Create New User</button>
-                    </inertia-link>
+                    <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md my-3" role="alert" v-if="$page.props.flash.message">
+                      <div class="flex">
+                        <div>
+                          <p class="text-sm">{{ $page.props.flash.message }}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <button @click="openModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">Create New Permission</button>
+                    
                     <table class="table-fixed w-full">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="px-4 py-2 w-20">User ID.</th>
+                                <th class="px-4 py-2 w-20">ID</th>
                                 <th class="px-4 py-2">Name</th>
-                                <th class="px-4 py-2">Email</th>
                                 <th class="px-4 py-2">Created At</th>
                                 <th class="px-4 py-2">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="row in data">
+                            <tr v-for="row in permission">
                                 <td class="border px-4 py-2">{{ row.id }}</td>
                                 <td class="border px-4 py-2">{{ row.name }}</td>
-                                <td class="border px-4 py-2">{{ row.email }}</td>
                                 <td class="border px-4 py-2">{{ row.created_at }}</td>
                                 <td class="border px-4 py-2">
-                                    <button @click="edit(row)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit</button>
-                                    <button @click="deleteRow(row)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
+                                    <button @click.prevent="edit(row)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit</button>
+                                    <button @click.prevent="deleteRow(row)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -51,26 +57,22 @@
                                     <jet-label for="name" value="Name" />
                                     <jet-input id="name" type="text" class="mt-1 block w-full" v-model="form.name" required autofocus autocomplete="name" />
                                 </div>
-                                <div class="mt-4">
-                                        <jet-label for="email" value="Email" />
-                                        <jet-input id="email" type="email" class="mt-1 block w-full" v-model="form.email" required />
-                                </div>
                             </div>
                           </div>
                           <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                             <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                              <button wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" v-show="!editMode" @click="save(form)">
+                              <button @click.prevent="save(form)" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" v-show="!editMode">
                                 Save
                               </button>
                             </span>
                             <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                              <button wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" v-show="editMode" @click="update(form)">
+                              <button @click.prevent="update(form)" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" v-show="editMode">
                                 Update
                               </button>
                             </span>
                             <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
                               
-                              <button @click="closeModal()" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                              <button @click.prevent="closeModal()" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                                 Cancel
                               </button>
                             </span>
@@ -100,49 +102,62 @@
             JetCheckbox,
             JetLabel,
         },
-        props: ['data', 'success'],
+        props: ['permission'],
         data() {
             return {
                 editMode: false,
                 isOpen: false,
+                message: '',
                 form: {
                     name: '',
-                    email: '',
                 },
             }
         },
+        async beforeRouteEnter (to, from, next) {
+            await this.$inertia.get('/admin/permission/list')
+        },
         methods: {
-            openModal: function () {
+            openModal: async function () {
                 this.isOpen = true;
             },
-            closeModal: function () {
+            closeModal: async function () {
                 this.isOpen = false;
-                this.reset();
+                await this.reset();
                 this.editMode=false;
             },
-            reset: function () {
+            reset: async function () {
                 this.form = {
                     name: '',
-                    email: '',
                 }
             },
-            edit: function (data) {
+            async save(data) {
+                await this.$inertia.post('/admin/permission/create', data)
+                await this.reset();
+                await this.closeModal();
+                this.editMode = false;
+            },
+            async edit(data) {
                 this.form = Object.assign({}, data);
                 this.editMode = true;
-                this.openModal();
+                await this.openModal();
             },
-            update: function (data) {
+            async update(data) {
                 data._method = 'PUT';
-                this.$inertia.post('/admin/user/' + data.id, data)
-                this.reset();
-                this.closeModal();
+                try{
+                    let response = await this.$inertia.post('/admin/permission/' + data.id, data)
+                    //console.log(response);
+                    await this.reset();
+                    await this.closeModal();
+                } catch(e) {
+                    this.message = e.response.data.message || 'There was an issue creating the user.';
+                }
             },
-            deleteRow: function (data) {
+            deleteRow: async function (data) {
                 if (!confirm('Are you sure want to remove?')) return;
                 data._method = 'DELETE';
-                this.$inertia.post('/admin/user/' + data.id, data)
-                this.reset();
-                this.closeModal();
+                await this.$inertia.post('/admin/permission/' + data.id, data)
+                await this.reset();
+                await this.closeModal();
             }
         }
     }

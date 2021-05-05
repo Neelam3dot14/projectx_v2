@@ -3,6 +3,10 @@
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Dashboard
+                <inertia-link :href="route('user.list')" class="hover:text-gray-900">
+                    User Management
+                </inertia-link>
+
             </h2>
         </template>
 

@@ -28,5 +28,26 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->name('dashboard');
 
-Route::get('/user/list', [UserController::class, 'index'])
+/*Route::name('Backend')
+    ->prefix('admin')
+    ->namespace('Backend')
+    //->middleware('can:manage-users')
+    ->group(__DIR__ . '/dashboard/roles.php');*/
+Route::group([
+    'namespace' => 'Backend',
+    'as' => 'backend.',
+    'prefix' => 'admin',
+    'middleware' => ['auth:sanctum', 'verified']
+], function () {
+    includeRouteFiles(__DIR__.'/backend/');
+});
+Route::get('/admin/user/list', [UserController::class, 'index'])
+        ->name('user.list');
+Route::get('/admin/user/create', [UserController::class, 'create'])
         ->name('user.create');
+Route::post('/admin/user/create', [UserController::class, 'store'])
+        ->name('user.store');
+Route::put('/admin/user/{id}', [UserController::class, 'update'])
+        ->name('user.update');
+Route::delete('/admin/user/{id}', [UserController::class, 'destroy'])
+        ->name('user.delete');
