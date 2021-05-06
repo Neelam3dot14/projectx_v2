@@ -58,4 +58,24 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public function roles() 
+    {
+        return $this->belongsToMany(Role::class, 'user_has_roles');
+    }
+
+    protected function getAllRoles(array $roles) 
+    {
+        return Role::whereIn('name', $roles)->get();
+    }
+
+    public function assignRoles(array $roles)
+    {
+        $roles = $this->getAllRoles($roles);
+        if($roles === null) {
+          return $this;
+        }
+        $this->roles()->saveMany($roles);
+        return $this;
+    }
 }

@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\Backend\UserController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -28,11 +27,6 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->name('dashboard');
 
-/*Route::name('Backend')
-    ->prefix('admin')
-    ->namespace('Backend')
-    //->middleware('can:manage-users')
-    ->group(__DIR__ . '/dashboard/roles.php');*/
 Route::group([
     'namespace' => 'Backend',
     'as' => 'backend.',
@@ -41,13 +35,3 @@ Route::group([
 ], function () {
     includeRouteFiles(__DIR__.'/backend/');
 });
-Route::get('/admin/user/list', [UserController::class, 'index'])
-        ->name('user.list');
-Route::get('/admin/user/create', [UserController::class, 'create'])
-        ->name('user.create');
-Route::post('/admin/user/create', [UserController::class, 'store'])
-        ->name('user.store');
-Route::put('/admin/user/{id}', [UserController::class, 'update'])
-        ->name('user.update');
-Route::delete('/admin/user/{id}', [UserController::class, 'destroy'])
-        ->name('user.delete');

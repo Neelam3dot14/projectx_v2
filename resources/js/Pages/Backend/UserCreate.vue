@@ -41,6 +41,13 @@
                     </div>
                 </jet-label>
             </div>
+            <div class="mt-4">
+                <jet-label for="role-list" value="Roles" />
+                <select v-model="form.roles" required multiple="true">
+                    <option value="">Select Roles</option>
+                    <option v-for="(value, key) in roles" :value="value">{{value}}</option>
+                </select>
+            </div>
 
             <div class="flex items-center justify-end mt-4">
                 <jet-button class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
@@ -74,7 +81,7 @@
             JetLabel,
             JetValidationErrors
         },
-
+        props: ['roles'],
         data() {
             return {
                 form: this.$inertia.form({
@@ -83,13 +90,14 @@
                     password: '',
                     password_confirmation: '',
                     terms: false,
+                    roles: [],
                 })
             }
         },
 
         methods: {
             submit() {
-                this.form.post(this.route('user.store'))
+                this.form.post(this.route('backend.user.store'))
             }
         }
     }

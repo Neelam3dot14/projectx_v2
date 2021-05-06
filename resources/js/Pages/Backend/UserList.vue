@@ -8,8 +8,14 @@
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg px-4 py-4">
-                {{ $page.props.success }}
-                   <inertia-link :href="route('user.create')">
+                    <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md my-3" role="alert" v-if="$page.props.flash.message">
+                      <div class="flex">
+                        <div>
+                          <p class="text-sm">{{ $page.props.flash.message }}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <inertia-link :href="route('backend.user.create')">
                         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">Create New User</button>
                     </inertia-link>
                     <table class="table-fixed w-full">
@@ -18,15 +24,17 @@
                                 <th class="px-4 py-2 w-20">User ID.</th>
                                 <th class="px-4 py-2">Name</th>
                                 <th class="px-4 py-2">Email</th>
+                                <th class="px-4 py-2">Roles</th>
                                 <th class="px-4 py-2">Created At</th>
                                 <th class="px-4 py-2">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="row in data">
+                            <tr v-for="row in users">
                                 <td class="border px-4 py-2">{{ row.id }}</td>
                                 <td class="border px-4 py-2">{{ row.name }}</td>
                                 <td class="border px-4 py-2">{{ row.email }}</td>
+                                 <td class="border px-4 py-2">{{ row.roles }}</td>
                                 <td class="border px-4 py-2">{{ row.created_at }}</td>
                                 <td class="border px-4 py-2">
                                     <button @click="edit(row)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit</button>
@@ -100,7 +108,7 @@
             JetCheckbox,
             JetLabel,
         },
-        props: ['data', 'success'],
+        props: ['users'],
         data() {
             return {
                 editMode: false,
@@ -112,6 +120,18 @@
             }
         },
         methods: {
+            async getUsers(page) {
+                console.log(data);
+                /*const params = { page };
+                try{
+                    let response = await user.all({params:params});
+                    console.log(response);
+                    this.users = response.data.data;
+                } catch(e) {
+                    console.log(e);
+                    //return { err: e, data: e.response.data};
+                }*/
+            },
             openModal: function () {
                 this.isOpen = true;
             },
@@ -144,6 +164,9 @@
                 this.reset();
                 this.closeModal();
             }
-        }
+        },
+        mounted: async function () {
+            await this.getUsers(2);            
+        },
     }
 </script>

@@ -21,9 +21,45 @@ class RoleController extends Controller
             'name' => 'required|unique:roles,name',
             'permission' => 'required',
         ]);
-
         $role = Role::create(['name' => $request->input('name')]);
-        $role->givePermissionTo($request->input('permission'));
-        return redirect()->route('role.list');
+        $role->givePermissionsTo($request->input('permission'));
+        return redirect()->route('backend.role.list')
+                ->with('message', 'Role Created Successfully.');
     }
+
+    public function update(Request $request, $id)
+    {   
+        $this->validate($request, [
+            'name' => 'required',
+            'permission' => 'required',
+        ]);
+
+        $role = Role::find($id);
+        $role->name = $request->input('name');
+        $role->save();
+        $permission = $request->input('permission');
+        $role->refreshPermissions($permission);
+        return redirect()->back()
+                ->with('message', 'Role Updated Successfully.');
+    }
+
+    public function destroy(Request $request)
+    {
+        if ($request->has('id')) {
+            $role = Role::find($request->input('id'));
+            $role->permissions()->detach();
+            $role->delete();
+            return redirect()->back()
+                ->with('message', 'Role Deleted Successfully.');
+        }
+    }
+
+    public function getAllRoleNames()
+    {
+        $result = Role::pluck('name');
+        return $result;
+    }
+
+    
+
 }
