@@ -33,5 +33,19 @@ Route::group([
     'prefix' => 'admin',
     'middleware' => ['auth:sanctum', 'verified']
 ], function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Backend/Dashboard');
+    })->name('admin.dashboard');
     includeRouteFiles(__DIR__.'/backend/');
+});
+
+Route::group([
+    'namespace' => 'Internal',
+    'as' => 'internal.',
+    'middleware' => ['auth:sanctum', 'verified']
+], function () {
+    Route::get('/internal/dashboard', function () {
+        return Inertia::render('Internal/Dashboard');
+    })->name('dashboard');
+    includeRouteFiles(__DIR__.'/internal/');
 });

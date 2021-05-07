@@ -1,8 +1,8 @@
 <template>
-    <app-layout>
+    <backend-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Dashboard hello
+                Create New User
             </h2>
         </template>
 
@@ -58,10 +58,10 @@
                 </div>
             </div>
         </div>
-    </app-layout>
+    </backend-layout>
 </template>
 <script>
-    import AppLayout from '@/Layouts/AppLayout'
+    import BackendLayout from '@/Layouts/Backend/AppLayout'
     import JetAuthenticationCard from '@/Jetstream/AuthenticationCard'
     import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo'
     import JetButton from '@/Jetstream/Button'
@@ -72,7 +72,7 @@
 
     export default {
         components: {
-            AppLayout,
+            BackendLayout,
             JetAuthenticationCard,
             JetAuthenticationCardLogo,
             JetButton,

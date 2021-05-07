@@ -1,8 +1,8 @@
 <template>
-    <app-layout>
+    <backend-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Manage Backend Roles
+                Manage Roles
             </h2>
         </template>
         <div class="py-12">
@@ -91,17 +91,17 @@
                 </div>
             </div>
         </div>
-    </app-layout>
+    </backend-layout>
 </template>
 <script>
-    import AppLayout from '@/Layouts/AppLayout'
+    import BackendLayout from '@/Layouts/Backend/AppLayout'
     import JetButton from '@/Jetstream/Button'
     import JetInput from '@/Jetstream/Input'
     import JetCheckbox from "@/Jetstream/Checkbox";
     import JetLabel from '@/Jetstream/Label'
     export default {
         components: {
-            AppLayout,
+            BackendLayout,
             JetButton,
             JetInput,
             JetCheckbox,

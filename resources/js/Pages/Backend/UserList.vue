@@ -1,8 +1,8 @@
 <template>
-    <app-layout>
+    <backend-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Manage Backend User
+                Manage Users
             </h2>
         </template>
         <div class="py-12">
@@ -92,17 +92,17 @@
                 </div>
             </div>
         </div>
-    </app-layout>
+    </backend-layout>
 </template>
 <script>
-    import AppLayout from '@/Layouts/AppLayout'
+    import BackendLayout from '@/Layouts/Backend/AppLayout'
     import JetButton from '@/Jetstream/Button'
     import JetInput from '@/Jetstream/Input'
     import JetCheckbox from "@/Jetstream/Checkbox";
     import JetLabel from '@/Jetstream/Label'
     export default {
         components: {
-            AppLayout,
+            BackendLayout,
             JetButton,
             JetInput,
             JetCheckbox,
@@ -120,18 +120,6 @@
             }
         },
         methods: {
-            async getUsers(page) {
-                console.log(data);
-                /*const params = { page };
-                try{
-                    let response = await user.all({params:params});
-                    console.log(response);
-                    this.users = response.data.data;
-                } catch(e) {
-                    console.log(e);
-                    //return { err: e, data: e.response.data};
-                }*/
-            },
             openModal: function () {
                 this.isOpen = true;
             },
@@ -166,7 +154,7 @@
             }
         },
         mounted: async function () {
-            await this.getUsers(2);            
+                
         },
     }
 </script>
