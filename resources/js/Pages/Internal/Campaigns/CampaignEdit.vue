@@ -39,13 +39,13 @@
                 <div>
                     <jet-label for="country" value="Country Name" />
                     <select id="country[]" class="mt-1 block w-full" v-model="form.country" multiple v-on:change="getGeoStateList()" required>
-                        <option v-for="country in countryList" :value="country">{{ country }}</option>
+                        <option v-for="country in countryList" :value="country">{{ country.country_code }}</option>
                     </select>
                 </div>
                 <div>
                     <jet-label for="states" value="Search Location" />
                     <select id="states" class="mt-1 block w-full" v-model="form.states" multiple>
-                        <option v-for="state in stateList" :value="state">{{ state }}</option>
+                        <option v-for="state in stateList" :value="state">{{ state.canonical_states }}</option>
                     </select>
                 </div>
             </div>
@@ -120,8 +120,8 @@
                     device:  this.campaign.device,
                     search_engine: this.campaign.search_engine,
                     execution_interval: 6,
-                    country: this.campaign.country,
-                    states: this.campaign.canonical_states,
+                    country: this.campaign.country_location,
+                    states: this.campaign.state_location,
                     crawler: this.campaign.crawler,
                     blacklisted_domain: this.campaign.blacklisted_domain,
                     whitelisted_domain: this.campaign.whitelisted_domain,

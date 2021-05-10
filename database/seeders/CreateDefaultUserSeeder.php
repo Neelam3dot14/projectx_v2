@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use App\Models\User;
 use App\Models\Team;
-use App\Models\Role;
+use Spatie\Permission\Models\Role;
 
 class CreateDefaultUserSeeder extends Seeder
 {
@@ -87,15 +87,15 @@ class CreateDefaultUserSeeder extends Seeder
                 $this->createTeam($user8);
             });
 
-        User::find(1)->assignRoles(config('access.users.super_admin_role'));
+        User::find(1)->assignRole(config('access.users.super_admin_role'));
         //assigning multiple roles to user i.e. Admin, Executive, Member
-        User::find(2)->assignRoles(config('access.users.admin_role'), config('access.users.executive_role'), config('access.users.member_role'));
-        User::find(3)->assignRoles(config('access.users.executive_role'), config('access.users.member_role'));
-        User::find(4)->assignRoles(config('access.users.member_role'));
-        User::find(5)->assignRoles(config('access.users.member_role'));
-        User::find(6)->assignRoles(config('access.users.member_role'));
-        User::find(7)->assignRoles(config('access.users.member_role'));
-        User::find(8)->assignRoles(config('access.users.member_role'));
+        User::find(2)->assignRole(config('access.users.admin_role'), config('access.users.executive_role'), config('access.users.member_role'));
+        User::find(3)->assignRole(config('access.users.executive_role'), config('access.users.member_role'));
+        User::find(4)->assignRole(config('access.users.member_role'));
+        User::find(5)->assignRole(config('access.users.member_role'));
+        User::find(6)->assignRole(config('access.users.member_role'));
+        User::find(7)->assignRole(config('access.users.member_role'));
+        User::find(8)->assignRole(config('access.users.member_role'));
 
         Schema::enableForeignKeyConstraints();
     }

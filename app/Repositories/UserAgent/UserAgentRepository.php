@@ -3,7 +3,7 @@
 namespace App\Repositories\UserAgent;
 
 //use JasonGuru\LaravelMakeRepository\Repository\BaseRepository;
-use App\Models\UserAgent;
+use App\Models\Internal\UserAgent;
 use Cache;
 
 /**

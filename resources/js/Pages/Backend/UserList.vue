@@ -63,6 +63,13 @@
                                         <jet-label for="email" value="Email" />
                                         <jet-input id="email" type="email" class="mt-1 block w-full" v-model="form.email" required />
                                 </div>
+                                <div>
+                                    <jet-label for="permission-list" value="Role List" />
+                                    <select v-model="form.roles" required multiple="true">
+                                        <option value="">Select Role</option>
+                                        <option v-for="(value, key) in roleList" :value="value">{{value}}</option>
+                                    </select>
+                                </div>
                             </div>
                           </div>
                           <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
@@ -108,7 +115,7 @@
             JetCheckbox,
             JetLabel,
         },
-        props: ['users'],
+        props: ['users', 'roles'],
         data() {
             return {
                 editMode: false,
@@ -116,39 +123,42 @@
                 form: {
                     name: '',
                     email: '',
+                    roles: [],
                 },
+                roleList: this.roles,
             }
         },
         methods: {
-            openModal: function () {
+            openModal: async function () {
                 this.isOpen = true;
             },
-            closeModal: function () {
+            closeModal: async function () {
                 this.isOpen = false;
-                this.reset();
+                await this.reset();
                 this.editMode=false;
             },
-            reset: function () {
+            reset: async function () {
                 this.form = {
                     name: '',
                     email: '',
+                    roles: [],
                 }
             },
-            edit: function (data) {
+            edit: async function (data) {
                 this.form = Object.assign({}, data);
                 this.editMode = true;
-                this.openModal();
+                await this.openModal();
             },
-            update: function (data) {
+            update: async function (data) {
                 data._method = 'PUT';
-                this.$inertia.post('/admin/user/' + data.id, data)
-                this.reset();
-                this.closeModal();
+                await this.$inertia.post('/admin/user/' + data.id, data)
+                await this.reset();
+                await this.closeModal();
             },
-            deleteRow: function (data) {
+            deleteRow: async function (data) {
                 if (!confirm('Are you sure want to remove?')) return;
                 data._method = 'DELETE';
-                this.$inertia.post('/admin/user/' + data.id, data)
+                await this.$inertia.post('/admin/user/' + data.id, data)
                 this.reset();
                 this.closeModal();
             }

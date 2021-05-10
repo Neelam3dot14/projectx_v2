@@ -2,8 +2,8 @@
 
 namespace App\Models\Internal;
 
-use App\Models\Keyword\AdTrace;
-use App\Models\Keyword\KeywordAd;
+use App\Models\Keyword\Internal\AdTrace;
+use App\Models\Keyword\Internal\KeywordAd;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

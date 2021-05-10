@@ -90,7 +90,7 @@
                     password: '',
                     password_confirmation: '',
                     terms: false,
-                    roles: [],
+                    roles: this.roles,
                 })
             }
         },

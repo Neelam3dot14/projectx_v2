@@ -39,13 +39,13 @@
                 <div>
                     <jet-label for="country" value="Country Name" />
                     <select id="country[]" class="mt-1 block w-full" v-model="form.country" multiple v-on:change="getGeoStateList()" required>
-                        <option v-for="country in countryList" :value="country">{{ country }}</option>
+                        <option v-for="country in countryList" :value="country">{{ country.canonical_country }}</option>
                     </select>
                 </div>
                 <div>
                     <jet-label for="states" value="Search Location" />
                     <select id="states" class="mt-1 block w-full" v-model="form.states" multiple>
-                        <option v-for="state in stateList" :value="state">{{ state }}</option>
+                        <option v-for="state in stateList" :value="state">{{ state.canonical_states }}</option>
                     </select>
                 </div>
             </div>

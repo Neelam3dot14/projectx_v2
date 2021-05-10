@@ -21,10 +21,6 @@ class CreateKeywordListener implements ShouldQueue
         $this->keyword = $keywordEvents->keyword;
         
         if($this->keyword->campaign->execution_type == 'Crawl'){
-            /*Bus::chain([
-                new CreateAlertRevision($this->keyword),
-                new CrawlKeyword($this->keyword),
-            ])->dispatch();*/
             CreateAlertRevision::dispatch($this->keyword);
         }
         if($this->keyword->Campaign->type == 'SERP'){

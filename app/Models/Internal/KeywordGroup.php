@@ -33,7 +33,7 @@ class KeywordGroup extends Model
         return $this->hasMany(CampaignKeyword::class, 'keyword_group_id');
     }
 
-   /* public function keywordGroupAd()
+    public function keywordGroupAd()
     {
         return $this->hasManyThrough(
             KeywordAd::class,
@@ -43,5 +43,5 @@ class KeywordGroup extends Model
             //'id', // Local key on the CampaignKeyword  table...
             //'id' // Local key on the KeywordAd table...
         );
-    }*/
+    }
 }

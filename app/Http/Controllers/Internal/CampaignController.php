@@ -112,10 +112,37 @@ class CampaignController extends Controller
     {
         $this->campaignRepo = new CampaignRepository();
         $campaigns = $this->campaignRepo->view($campaign->id);
-        return Inertia::render('Internal/Campaigns/CampaignEdit', ['campaign' => $campaigns[0] ]);
+        if (isset($campaigns[0]->whitelisted_domain)){
+            $whitelisted_domains = str_replace(",", PHP_EOL, $campaigns[0]->whitelisted_domain);
+        } else {
+            $whitelisted_domains = '';
+        }
+
+        if (isset($campaigns[0]->blacklisted_domain)){
+            $blacklisted_domains = str_replace(",", PHP_EOL, $campaigns[0]->blacklisted_domain);
+        } else {
+            $blacklisted_domains = '';
+        }
+        $campData = [
+            'id' => $campaigns[0]->id,
+            'name' => $campaigns[0]->name,
+            'keywords' => $campaigns[0]->keywords,
+            'device' => explode(",", $campaigns[0]->device),
+            'search_engine' => explode(",", $campaigns[0]->searchEngine),
+            'crawler' => $campaigns[0]->crawler,
+            'execution_interval' => $campaigns[0]->execution_interval,
+            'country' => explode(",", $campaigns[0]->country),
+            'states' => isset($campaigns[0]->canonical_states) ? explode(",", $campaigns[0]->canonical_states) : '',
+            'country_location' => $campaigns[0]->location,
+            'state_location' => isset($campaigns[0]->canonical_states) ? $campaigns[0]->location : '',
+            'location' => $campaigns[0]->location,
+            'whitelisted_domain' => $whitelisted_domains,
+            'blacklisted_domain' => $blacklisted_domains,
+        ];
+        return Inertia::render('Internal/Campaigns/CampaignEdit', [ 'campaign' => $campData ]);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, Campaign $campaign)
     {
         $data = $request->validate([
             'name' => 'required',
@@ -147,9 +174,10 @@ class CampaignController extends Controller
             }
             $gl_code = implode(",", $gl_code);
             $google_domain = implode(",", $google_domain);
-            $geodata = json_encode($data['country_location']);
+            $geodata = json_encode($data['country']);
         }
-        $data['search_engine'] = strtolower($data['search_engine']);
+        $data['search_engine'] = strtolower(implode(",", $data['search_engine']));
+        $data['device'] = strtolower(implode(",", $data['device']));
         $data['country'] = $gl_code;
         $data['canonical_states'] = isset($canonical_states) ? $canonical_states : '';
         $data['gl_code'] = $gl_code;
@@ -182,6 +210,110 @@ class CampaignController extends Controller
         $this->campaignRepo->updateMatchKeywords($campaign, $matched_keywords, $data);
         
         $campaign->update($data);
-        return Inertia::render('Internal/Campaigns/CampaignIndex');
+        return redirect()->route('internal.campaign.list')
+            ->with(['message'=> 'Campaign Edited Successfully.', 'campaigns' => $campaign]);
     }
+
+    public function destroy($campaign_id)
+    {
+        $result = Campaign::where('id', $campaign_id)
+                    ->where('created_by',\Auth::id())
+                    ->delete();
+        if($result){
+            $response = [
+                'msg' => 'campaign Deleted'
+            ];
+        }
+        else{
+            $response = [
+                'error' => 'campaign not Deleted'
+            ];
+        }
+        return response($response, 201);
+    }
+    
+    public function pause($campaign_id)
+    {
+        $this->campaignRepo = new CampaignRepository();
+        $result = $this->campaignRepo->pauseCampaign($campaign_id);
+
+        if($result){
+            $response = [
+                'msg' => 'Campaign Successfully Paused'
+            ];
+        }
+        else{
+            $response = [
+                'error' => 'Campaign Pause Face Issue'
+            ];
+        }
+
+        return response($response, 201);
+    }
+
+    public function reActivate($campaign_id)
+    {
+        $this->campaignRepo = new CampaignRepository();
+        $result = $this->campaignRepo->activateCampaign($campaign_id);
+
+        if($result){
+            $response = [
+                'msg' => 'Campaign Successfully Re-Activated'
+            ];
+        }
+        else{
+            $response = [
+                'error' => 'Campaign Re-Activation Facing Issue'
+            ];
+        }
+
+        return response($response, 201);
+    }
+
+    public function execute($campaign_id)
+    {
+        $this->campaignRepo = new CampaignRepository();
+        $this->campaignRepo->executeKeywordsProcessing($campaign_id);
+        $result = Campaign::find($campaign_id)
+                    ->update(['status' => 'ACTIVE']);
+        $response = [
+            'msg' => 'Added in Execution Queue'
+        ];
+        return response($response, 200);
+    }
+
+    public function export($campaign_id)
+    {
+        $fileName = 'Campaign Report '.$campaign_id.'csv';
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+        $this->campaignRepo = new CampaignRepository();
+        $callback = $this->campaignRepo->exportCampaign($campaign_id);
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function exportAll(Request $request)
+    {
+        ini_set('memory_limit', '-1');
+        $fileName = 'Campaigns Report'.'csv';
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+        $this->campaignRepo = new CampaignRepository();
+        $user_id = \Auth::id();
+        $callback = $this->campaignRepo->exportAllCampaign($user_id);
+        return response()->stream($callback, 200, $headers);
+    }
+
+
+
 }

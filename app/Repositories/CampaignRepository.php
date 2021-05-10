@@ -8,13 +8,13 @@ use App\Models\Internal\Campaign;
 use App\Models\Internal\CampaignKeyword;
 use App\Models\Internal\Keyword\KeywordAd;
 use App\Models\Internal\KeywordGroup;
-use App\Models\AdHijack;
-use App\Models\AdCompetition;
+use App\Models\Internal\AdHijack;
+use App\Models\Internal\AdCompetition;
 use App\Http\Resources\Keyword\KeywordGroupResource;
 use App\Events\CampaignEvents;
 use App\Repositories\Geotarget\GeotargetRepository;
 use App\Models\Internal\AlertRevision;
-use App\Jobs\AdsCompetition;
+use App\Jobs\Internal\AdsCompetition;
 
 class CampaignRepository
 {
@@ -55,9 +55,9 @@ class CampaignRepository
         /*$alertRevision = AlertRevision::find(85);
         $ad = KeywordAd::find(571);
         AdsCompetition::dispatch($alertRevision, $ad);*/
-        /*$keyword = CampaignKeyword::find(10);
-        event(KeywordEvents::KEYWORD_SCRAPED, new KeywordEvents($keyword, 11));
-        //event(KeywordEvents::KEYWORD_CRAWLED, new KeywordEvents($keyword, 11));*/
+        /*$keyword = CampaignKeyword::find(2);
+        event(KeywordEvents::KEYWORD_SCRAPED, new KeywordEvents($keyword, 3));
+        //event(KeywordEvents::KEYWORD_CRAWLED, new KeywordEvents($keyword, 1));*/
         $campaignKeywords = Campaign::find($campaign_id)
             ->keywords()->get();
         foreach($campaignKeywords as $keyword){

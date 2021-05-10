@@ -3,7 +3,7 @@
 
 namespace App\Repositories\Backend\User;
 
-use App\Models\Role;
+use Spatie\Permission\Models\Role;
 
 class RoleRepository
 {

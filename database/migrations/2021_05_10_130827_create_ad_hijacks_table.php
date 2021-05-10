@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePermissionsTable extends Migration
+class CreateAdHijacksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,12 @@ class CreatePermissionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('permissions', function (Blueprint $table) {
+        Schema::create('ad_hijacks', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 200);
+            $table->foreignId('ad_trace_id');
+            $table->foreignId('ad_id');
+            $table->foreignId('campaign_id');
+            $table->text('traced_domain');
             $table->timestamps();
         });
     }
@@ -27,6 +30,6 @@ class CreatePermissionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('permissions');
+        Schema::dropIfExists('ad_hijacks');
     }
 }

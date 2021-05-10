@@ -30,4 +30,24 @@ class Campaign extends Model
         'status',
         'created_by',
     ];
+
+    public function keywords()
+    {
+        return $this->hasMany(CampaignKeyword::class);
+    }
+
+    public function keywordGroups()
+    {
+        return $this->hasMany(KeywordGroup::class);
+    }
+    
+    public function keywordAds()
+    {
+        return $this->hasManyThrough(KeywordAd::class, CampaignKeyword::class, 'campaign_id', 'keyword_id' );
+    }
+
+    public function alertRevisions()
+    {
+        return $this->hasManyThrough(AlertRevision::class, CampaignKeyword::class, 'campaign_id', 'keyword_id');
+    }
 }

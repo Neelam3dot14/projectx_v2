@@ -9,7 +9,7 @@ use App\Http\Resources\Backend\User\UserResource;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Validator;
 use Hash;
-use App\Models\Role;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -19,6 +19,7 @@ class UserController extends Controller
             'can' => [
                 'create_user' => \Auth::user()->can('users.create'),
             ],
+            'roles' => Role::pluck('name'),
             'users' => User::all()->map(function ($user) {
                 return [
                     'id' => $user->id,
@@ -55,7 +56,7 @@ class UserController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
-        $user->assignRoles($data['roles']);
+        $user->assignRole($data['roles']);
         
         return redirect()->route('backend.user.list')
                 ->with('message', 'User Created Successfully.');
@@ -66,11 +67,14 @@ class UserController extends Controller
         Validator::make($request->all(), [
             'name' => ['required'],
             'email' => ['required'],
+            'roles' => ['required'],
         ])->validate();
   
         if ($request->has('id')) {
-            User::find($request->input('id'))->update($request->all());
-            return redirect()->route('backend.user.list')
+            $user = User::find($request->input('id'));
+            $user->update($request->all());
+            $user->syncRoles($request->get('roles'));
+            return redirect()->back()
                     ->with('message', 'User Updated Successfully.');
         }
     }

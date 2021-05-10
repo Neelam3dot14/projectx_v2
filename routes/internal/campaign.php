@@ -10,7 +10,7 @@ Route::group([
 ], function () {
     Route::get('/campaigns', [CampaignController::class, 'index'])->name('list');
 
-    Route::get('/campaigns/export', [CampaignController::class, 'exportAll']);
+    Route::get('/campaigns/export', [CampaignController::class, 'exportAll'])->name('campaign.export.all');
 
     Route::get('/campaigns/export/all', [CampaignController::class, 'exportAllTest']);
 
@@ -33,21 +33,21 @@ Route::group([
             ->name('delete');
 
         Route::post('/{campaign}/execute', [CampaignController::class, 'execute'])
-            ->name('campaign.execute');
-
-        Route::get('/{campaign}/export', [CampaignController::class, 'export'])
-            ->name('campaign.export');
+            ->name('execute');
         
-        Route::get('/{campaign}/exporttest', [CampaignController::class, 'exportTestCamp'])
-            ->name('campaign.exporttest');
-
-        Route::get('/{campaign}/keyword', [CampaignController::class, 'getCampaignKeywords'])
-            ->name('campaign.keyword');
-
         Route::get('/{campaign}/pause', [CampaignController::class, 'pause'])
-            ->name('campaign.pause');
+            ->name('pause');
 
         Route::get('/{campaign}/reactivate', [CampaignController::class, 'reActivate'])
-            ->name('campaign.reactivate');
+            ->name('reactivate');
+
+        Route::get('/{campaign}/export', [CampaignController::class, 'export'])
+            ->name('export');
+        
+        Route::get('/{campaign}/exporttest', [CampaignController::class, 'exportTestCamp'])
+            ->name('exporttest');
+
+        Route::get('/{campaign}/keyword', [CampaignController::class, 'getCampaignKeywords'])
+            ->name('keyword');
     });
 });

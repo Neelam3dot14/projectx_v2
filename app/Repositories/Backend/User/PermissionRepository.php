@@ -3,7 +3,7 @@
 
 namespace App\Repositories\Backend\User;
 
-use App\Models\Permission;
+use Spatie\Permission\Models\Permission;
 
 class PermissionRepository
 {

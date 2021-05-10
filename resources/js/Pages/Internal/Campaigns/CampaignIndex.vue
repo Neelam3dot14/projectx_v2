@@ -8,15 +8,14 @@
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                <div v-if=message>{{ message }}</div>
+                <div class="bg-white shadow-xl sm:rounded-lg">
                     <inertia-link :href="route('internal.campaign.create')">
                         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">New Campaign</button>
                     </inertia-link>
+                    <button @click.prevent="onExportAll($event)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3 ml-4">Export All</button>
+                    
                     <!--table-->
-                    <div class="flex flex-col">
-                    <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                        <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                            <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                                 <table class="min-w-full divide-y divide-gray-200">
                                     <thead class="bg-gray-50">
                                     <tr>
@@ -78,15 +77,51 @@
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+  <Menu as="div" class="relative inline-block text-left">
+    <div>
+      <MenuButton class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500">
+        Actions
+        <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
+      </MenuButton>
+    </div>
+
+    <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+      <MenuItems class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <div class="py-1">
+          <MenuItem v-slot="{ active }">
+            <a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">View</a>
+          </MenuItem>
+          <MenuItem v-slot="{ active }">
+            <a @click.prevent="edit(campaign.id)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Edit</a>
+          </MenuItem>
+          <MenuItem v-slot="{ active }">
+            <a @click.prevent="onDelete(campaign.id)"  :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Delete</a>
+          </MenuItem>
+           <MenuItem v-slot="{ active }">
+            <a @click.prevent="onExecute(campaign.id)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Execute</a>
+          </MenuItem>
+          <MenuItem v-slot="{ active }" v-if="campaign.status =='ACTIVE'">
+            <a @click.prevent="onPause(campaign.id)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Pause</a>
+          </MenuItem>
+          <MenuItem v-slot="{ active }" v-if="campaign.status =='INACTIVE'">
+            <a @click.prevent="onReActivate(campaign.id)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">ReActivate</a>
+          </MenuItem>
+           <MenuItem v-slot="{ active }">
+            <a @click.prevent="onExport(campaign.id)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Export</a>
+          </MenuItem>
+           <MenuItem v-slot="{ active }">
+            <a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Background Export</a>
+          </MenuItem>
+        </div>
+      </MenuItems>
+    </transition>
+  </Menu>
+
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
+                           
                     <!--end of table-->
                 </div>
             </div>
@@ -95,18 +130,135 @@
 </template>
 
 <script>
-   import InternalLayout from '@/Layouts/Internal/AppLayout'
+    import InternalLayout from '@/Layouts/Internal/AppLayout'
+    import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
+    import { ChevronDownIcon } from '@heroicons/vue/solid'
+    import api from "../../../components/campaigns";
 
     export default {
         components: {
             InternalLayout,
+            Menu,
+            MenuButton,
+            MenuItem,
+            MenuItems,
+            ChevronDownIcon,
         },
         props: ['campaigns'],
         data() {
             return {
                 message: null,
-                //campaigns,
             }
         },
+        methods:{
+            async edit(id){
+                await this.$inertia.get('/campaign/' + id);
+            },
+            async onExecute(id, $event) {
+                try{
+                    let response = await api.execute(id);
+                    this.message = "Campaign added to execution queue!";
+                } catch(e) {
+                    console.log(e);
+                    if(e.response && e.response.data){
+                        this.message = e.response.data.message || 'There was an issue while exporting the campaign.';
+                        var errorMessage = '';
+                        for( var error in e.response.data.errors ){
+                            errorMessage += "  "+e.response.data.errors[error];
+                        }
+                        this.message += ""+errorMessage;
+                    }
+                }
+            },
+            async onDelete(id, $event) {
+                try{
+                    let response = await api.delete(id);
+                    this.message = response.data.msg;
+                    setTimeout(() => location.reload(), 1000);
+                } catch(e) {
+                    console.log(e);
+                    if(e.response && e.response.data) {
+                        this.message = e.response.data.message || 'There was an issue while Deleting the campaign.';
+                    }
+                }
+            },
+            async onPause(id, $event) {
+                try{
+                    let response = await api.pause(id);
+                    this.message = response.data.msg;
+                    setTimeout(() => location.reload(), 1000);
+                } catch(e) {
+                    console.log(e);
+                    if(e.response && e.response.data) {
+                        this.message = e.response.data.message || 'There was an issue while Pausing the campaign.';
+                    }
+                }
+            },
+            async onReActivate(id, $event) {
+                try{
+                    let response = await api.reActivate(id);
+                    this.message = response.data.msg;
+                    setTimeout(() => location.reload(), 1000);
+                } catch(e) {
+                    console.log(e);
+                    if(e.response && e.response.data) {
+                        this.message = e.response.data.message || 'There was an issue while Re-Activating campaign.';
+                    }
+                }
+            },
+            async onDelete(id, $event) {
+                try{
+                    let response = await api.delete(id);
+                    this.message = response.data.msg;
+                    setTimeout(() => location.reload(), 1000);
+                } catch(e) {
+                    console.log(e);
+                    if(e.response && e.response.data) {
+                        this.message = e.response.data.message || 'There was an issue while Deleting the campaign.';
+                    }
+                }
+            },
+            async onExport(id, $event) {
+                try{
+                    let response = await api.export(id);
+                    console.log(response);
+                    let blob = new Blob([response.data], { type: 'text/csv' })
+                    let link = document.createElement('a')
+                    link.href = window.URL.createObjectURL(blob)
+                    link.download = 'export.csv'
+                    link.click()
+                } catch(e) {
+                    console.log(e);
+                    if(e.response && e.response.data){
+                        this.message = e.response.data.message || 'There was an issue while executing the campaign.';
+                        var errorMessage = '';
+                        for( var error in e.response.data.errors ){
+                            errorMessage += "  "+e.response.data.errors[error];
+                        }
+                        this.message += ""+errorMessage;
+                    }
+                }
+            },
+            async onExportAll(event) {
+                try{
+                    let response = await api.exportAll();
+                    let blob = new Blob([response.data], { type: 'text/csv' })
+                    let link = document.createElement('a')
+                    link.href = window.URL.createObjectURL(blob)
+                    link.download = 'export.csv'
+                    link.click()
+                } catch(e) {
+                    console.log(e);
+                    if(e.response && e.response.data){
+                        this.message = e.response.data.message || 'There was an issue while exporting the campaigns.';
+                        var errorMessage = '';
+                        for( var error in e.response.data.errors ){
+                            errorMessage += "  "+e.response.data.errors[error];
+                        }
+                        this.message += ""+errorMessage;
+                    }
+                }
+            },
+        }
     }
 </script>

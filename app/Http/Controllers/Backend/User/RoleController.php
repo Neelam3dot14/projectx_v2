@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Backend\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Role;
+use Spatie\Permission\Models\Role;
 use Inertia\Inertia;
 
 class RoleController extends Controller
@@ -22,7 +22,7 @@ class RoleController extends Controller
             'permission' => 'required',
         ]);
         $role = Role::create(['name' => $request->input('name')]);
-        $role->givePermissionsTo($request->input('permission'));
+        $role->givePermissionTo($request->input('permission'));
         return redirect()->route('backend.role.list')
                 ->with('message', 'Role Created Successfully.');
     }
@@ -38,7 +38,7 @@ class RoleController extends Controller
         $role->name = $request->input('name');
         $role->save();
         $permission = $request->input('permission');
-        $role->refreshPermissions($permission);
+        $role->givePermissionTo($permission);
         return redirect()->back()
                 ->with('message', 'Role Updated Successfully.');
     }
