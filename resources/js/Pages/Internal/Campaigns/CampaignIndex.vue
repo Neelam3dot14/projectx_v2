@@ -67,7 +67,7 @@
                                                 <div class="text-sm text-gray-900">{{ campaign.country }}</div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-gray-900">{{ campaign.states }}</div>
+                                                <div class="text-sm text-gray-900">{{ campaign.canonical_states }}</div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm text-gray-900">{{ campaign.execution_interval }}</div>

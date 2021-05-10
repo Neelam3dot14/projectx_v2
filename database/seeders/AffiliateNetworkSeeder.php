@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\AffiliateNetwork;
+use App\Models\Internal\AffiliateNetwork;
 use DB;
 
 class AffiliateNetworkSeeder extends Seeder

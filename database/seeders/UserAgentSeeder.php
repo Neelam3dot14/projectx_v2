@@ -5,7 +5,8 @@ namespace Database\Seeders;
 use Flynsarmy\CsvSeeder\CsvSeeder;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\UserAgent;
+use App\Models\Internal\UserAgent;
+
 class UserAgentSeeder extends Seeder
 {
     /**

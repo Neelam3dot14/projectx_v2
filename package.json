@@ -26,6 +26,7 @@
         "vue-loader": "^16.1.2"
     },
     "dependencies": {
+        "v-select2-component": "^0.4.7",
         "vue-multiselect": "^2.1.6"
     }
 }

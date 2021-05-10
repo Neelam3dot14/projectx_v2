@@ -15,10 +15,10 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             GeoTargetCsvSeeder::class,
+            YahooDomainSeeder::class,
             RolePermissionSeeder::class,
             CreateDefaultUserSeeder::class,
             AffiliateNetworkSeeder::class,
-            YahooDomainSeeder::class,
             UserAgentSeeder::class,
         ]);
     }

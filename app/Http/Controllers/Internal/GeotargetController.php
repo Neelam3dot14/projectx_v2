@@ -61,6 +61,11 @@ class GeotargetController extends Controller
         $data = Geotarget::select('country_code', 'canonical_country')
                     ->distinct('country_code')
                     ->get();
+        /*$countryArr = [];
+        foreach($data as $v){
+            array_push($countryArr, $v['canonical_country']);
+        }
+        return $countryArr;*/
         return CountryResource::collection($data);   
     }
 

@@ -69,7 +69,7 @@ class User extends Authenticatable
         return Role::whereIn('name', $roles)->get();
     }
 
-    public function assignRoles(array $roles)
+    public function assignRoles(... $roles)
     {
         $roles = $this->getAllRoles($roles);
         if($roles === null) {

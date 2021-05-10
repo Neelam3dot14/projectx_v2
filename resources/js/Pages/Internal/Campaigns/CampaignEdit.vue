@@ -2,7 +2,7 @@
     <internal-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Create New Campaign
+               Edit Campaign
             </h2>
         </template>
 
@@ -30,7 +30,7 @@
                 <div>
                     <jet-label for="search_engine" value="Search Engine" />
                     <select id="device" class="mt-1 block w-full" v-model="form.search_engine" multiple="true" required>
-                        <option v-for="search_engine in searchEngineList" :value="search_engine">{{ search_engine }}</option>
+                        <option v-for="search_engine in searchEngineList" :value="search_engine" :selected="form.search_engine == search_engine">{{ search_engine }}</option>
                     </select>
                 </div>
             </div>
@@ -77,7 +77,7 @@
 
             <div class="flex items-center justify-end mt-4">
                 <jet-button class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Create
+                    Update Campaign
                 </jet-button>
             </div>
         </form>
@@ -96,6 +96,7 @@
     import JetLabel from '@/Jetstream/Label'
     import JetValidationErrors from '@/Jetstream/ValidationErrors'
     import geotarget from '../../../components/geotargets';
+    import api from '../../../components/campaigns'
 
     export default {
         components: {
@@ -108,20 +109,22 @@
             JetLabel,
             JetValidationErrors,
         },
-        props: [''],
+        props: ['campaign'],
         data() {
             return {
                 form: this.$inertia.form({
-                    name: '',
-                    keywords: '',
-                    device: [],
-                    search_engine: [],
+                    _method: 'PUT',
+                    id: this.campaign.id,
+                    name: this.campaign.name,
+                    keywords: this.campaign.keywords,
+                    device:  this.campaign.device,
+                    search_engine: this.campaign.search_engine,
                     execution_interval: 6,
-                    country: [],
-                    states: [],
-                    crawler: [],
-                    blacklisted_domain: null,
-                    whitelisted_domain: null,
+                    country: this.campaign.country,
+                    states: this.campaign.canonical_states,
+                    crawler: this.campaign.crawler,
+                    blacklisted_domain: this.campaign.blacklisted_domain,
+                    whitelisted_domain: this.campaign.whitelisted_domain,
                 }),
                 countryList: [],
                 stateList: [],
@@ -150,8 +153,8 @@
                 this.stateList = response.data.data;
             },
             submit() {
-                this.form.post(this.route('internal.campaign.store'))
+                this.form.post('/campaign/' + this.form.id)
             },
-        }
+        },
     }
 </script>

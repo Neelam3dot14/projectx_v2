@@ -23,7 +23,7 @@ class Role extends Model
         return Permission::whereIn('name', $permissions)->get();
     }
 
-    public function givePermissionsTo(array $permissions) 
+    public function givePermissionsTo(... $permissions) 
     {
         $permissions = $this->getAllPermissions($permissions);
         if($permissions === null) {

@@ -4,8 +4,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+use App\Models\Role;
+use App\Models\Permission;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -14,7 +14,7 @@ class RolePermissionSeeder extends Seeder
      *
      * @return void
      */
-    protected $toTruncate = ['roles', 'model_has_roles', 'permissions', 'role_has_permissions', 'model_has_permissions'];
+    protected $toTruncate = ['roles', 'user_has_roles', 'permissions', 'role_has_permissions'];
 
     public function run()
     {
@@ -41,16 +41,16 @@ class RolePermissionSeeder extends Seeder
             Permission::create(['name' => $permission]);
         }
         //Assign Permissions to Member
-        $member->givePermissionTo($member_permissions);
+        $member->givePermissionsTo($member_permissions);
 
         //Assign Permissions to Executive
-        $executive->givePermissionTo($executive_permissions);
+        $executive->givePermissionsTo($executive_permissions);
 
         // Assign Permissions to Admin
-        $admin->givePermissionTo($admin_permissions);
+        $admin->givePermissionsTo($admin_permissions);
 
         // ALWAYS GIVE SUPER ADMIN ROLE ALL PERMISSIONS
-        $superAdmin->givePermissionTo(Permission::all());
+        $superAdmin->givePermissionsTo(Permission::all());
 
         Schema::enableForeignKeyConstraints();
     }
