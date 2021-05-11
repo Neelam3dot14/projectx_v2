@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Repositories\Backend\User\PermissionRepository;
+use App\Http\Resources\Backend\User\PermissionResource;
 use Inertia\Inertia;
 
 class PermissionController extends Controller
@@ -24,29 +25,28 @@ class PermissionController extends Controller
             'name'=>'required|max:40',
         ]);
         $name = $request['name'];
-        $permission = Permission::create(['name' => $name ]);
-        return redirect()->route('backend.permission.list')
+        $permission = Permission::create(['guard_name' => 'web', 'name' => $name ]);
+        return redirect()->back()
                 ->with('message', 'Permission Created Successfully.');
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
         $this->validate($request, [
             'name'=>'required|max:40',
         ]);
-  
-        if ($request->has('id')) {
-            Permission::find($request->input('id'))->update($request->all());
-            return redirect()->back()
-                    ->with('message', 'Permission Updated Successfully.');
-        }
+        $permission = Permission::findOrFail($id);
+        $input = $request->all();
+        $permission->fill($input)->save();
+        return new PermissionResource($permission);
     }
 
     public function destroy(Request $request)
     {
         if ($request->has('id')) {
             Permission::find($request->input('id'))->delete();
-            return redirect()->back();
+            return redirect()->back()
+                ->with('message', 'Permission Deleted Successfully.');
         }
     }
 

@@ -11,8 +11,18 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $data = Role::all();
-        return Inertia::render('Backend/RoleList', ['data' => $data]);
+        return Inertia::render('Backend/RoleList', [
+            'data' => Role::all()->map(function ($role) {
+                return [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'permissions' => str_replace(array('[',']','"'),'', $role->permissions()->pluck('name')),
+                    'created_at' => date('d-m-Y h:i:s', strtotime($role->created_at)),
+                ];
+            }),
+        ]);  
+        /*$data = Role::all();
+        return Inertia::render('Backend/RoleList', ['data' => $data]);*/
     }
 
     public function store(Request $request)
@@ -21,7 +31,7 @@ class RoleController extends Controller
             'name' => 'required|unique:roles,name',
             'permission' => 'required',
         ]);
-        $role = Role::create(['name' => $request->input('name')]);
+        $role = Role::create(['guard_name' => 'web', 'name' => $request->input('name')]);
         $role->givePermissionTo($request->input('permission'));
         return redirect()->route('backend.role.list')
                 ->with('message', 'Role Created Successfully.');
@@ -38,7 +48,7 @@ class RoleController extends Controller
         $role->name = $request->input('name');
         $role->save();
         $permission = $request->input('permission');
-        $role->givePermissionTo($permission);
+        $role->syncPermissions($permission);
         return redirect()->back()
                 ->with('message', 'Role Updated Successfully.');
     }
@@ -59,7 +69,5 @@ class RoleController extends Controller
         $result = Role::pluck('name');
         return $result;
     }
-
-    
 
 }

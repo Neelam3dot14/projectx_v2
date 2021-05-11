@@ -8,6 +8,7 @@
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg px-4 py-4">
+                    <div v-if="message">{{ message }}</div>
                     <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md my-3" role="alert" v-if="$page.props.flash.message">
                       <div class="flex">
                         <div>
@@ -63,13 +64,13 @@
                               </button>
                             </span>
                             <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                              <button @click.prevent="update(form)" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" v-show="editMode">
+                              <button @click.prevent="onUpdate(form)" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" v-show="editMode">
                                 Update
                               </button>
                             </span>
                             <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
                               
-                              <button @click.prevent="closeModal()" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                              <button @click="closeModal()" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                                 Cancel
                               </button>
                             </span>
@@ -91,6 +92,7 @@
     import JetInput from '@/Jetstream/Input'
     import JetCheckbox from "@/Jetstream/Checkbox";
     import JetLabel from '@/Jetstream/Label'
+    import permission_api from '../../components/permissions';
     export default {
         components: {
             BackendLayout,
@@ -102,6 +104,7 @@
         props: ['permission'],
         data() {
             return {
+                permission: this.permission,
                 editMode: false,
                 isOpen: false,
                 message: '',
@@ -110,8 +113,8 @@
                 },
             }
         },
-        async beforeRouteEnter (to, from, next) {
-            await this.$inertia.get('/admin/permission/list')
+        mounted: async function () {
+               
         },
         methods: {
             openModal: async function () {
@@ -127,26 +130,36 @@
                     name: '',
                 }
             },
-            async save(data) {
+            save: async function (data) {
                 await this.$inertia.post('/admin/permission/create', data)
                 await this.reset();
                 await this.closeModal();
                 this.editMode = false;
+                location.reload();
             },
-            async edit(data) {
+            edit: async function (data) {
                 this.form = Object.assign({}, data);
                 this.editMode = true;
                 await this.openModal();
             },
-            async update(data) {
+            update: async function (data) {
                 data._method = 'PUT';
+                await this.$inertia.post('/admin/permission/' + data.id, data)
+                await this.reset();
+                await this.closeModal();
+            },
+            async onUpdate(data, $event) {
                 try{
-                    let response = await this.$inertia.post('/admin/permission/' + data.id, data)
-                    //console.log(response);
+                    data._method = 'PUT';
+                    let response = await permission_api.update(data.id, data)
                     await this.reset();
                     await this.closeModal();
-                } catch(e) {
-                    this.message = e.response.data.message || 'There was an issue creating the user.';
+                    this.message = 'Permission updated Successfully';
+                    setTimeout(() => this.message = null, 2000);
+                    location.reload();
+                } catch(e){
+                    console.log(e);
+                    this.message = e.response.data.errors;
                 }
             },
             deleteRow: async function (data) {

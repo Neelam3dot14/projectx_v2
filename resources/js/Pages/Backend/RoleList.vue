@@ -7,7 +7,7 @@
         </template>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg px-4 py-4">
+                <div class="bg-white shadow-xl sm:rounded-lg px-4 py-4">
                     <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md my-3" role="alert" v-if="$page.props.flash.message">
                       <div class="flex">
                         <div>
@@ -17,21 +17,41 @@
                     </div>
                     <button @click="openModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">Create New Roles</button>
                     
-                    <table class="table-fixed w-full">
-                        <thead>
-                            <tr class="bg-gray-100">
-                                <th class="px-4 py-2 w-20">ID</th>
-                                <th class="px-4 py-2">Name</th>
-                                <th class="px-4 py-2">Created At</th>
-                                <th class="px-4 py-2">Action</th>
+                     <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Id
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Name
+                                </th>
+                                <!--<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Permissions
+                                </th>-->
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Created at
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Action
+                                </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="bg-white divide-y divide-gray-200">
                             <tr v-for="row in data">
-                                <td class="border px-4 py-2">{{ row.id }}</td>
-                                <td class="border px-4 py-2">{{ row.name }}</td>
-                                <td class="border px-4 py-2">{{ row.created_at }}</td>
-                                <td class="border px-4 py-2">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ row.id }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ row.name }}</div>
+                                </td>
+                                <!--<td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ row.permissions }}</div>
+                                </td>-->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ row.created_at }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
                                     <button @click.prevent="edit(row)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit</button>
                                     <button @click.prevent="deleteRow(row)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
                                 </td>
@@ -159,6 +179,7 @@
                     await this.reset();
                     await this.closeModal();
                     this.editMode = false;
+                    location.reload();
                 } catch(e) {
                     this.message = e.response.data.message || 'There was an issue creating the Role';
                 }
@@ -175,6 +196,7 @@
                     //console.log(response);
                     await this.reset();
                     await this.closeModal();
+                    location.reload();
                 } catch(e) {
                     this.message = e.response.data.message || 'There was an issue creating the user.';
                 }
