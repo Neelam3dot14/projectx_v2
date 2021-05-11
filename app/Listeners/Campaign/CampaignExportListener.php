@@ -6,7 +6,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use App\Repositories\CampaignRepository;
 use App\Events\CampaignExportEvents;
-use App\Models\Campaign;
+use App\Models\Internal\Campaign;
 use App\Models\User;
 use File;
 use App\Notifications\ExportNotification;

@@ -12,11 +12,15 @@ Route::group([
 
     Route::get('/campaigns/export', [CampaignController::class, 'exportAll'])->name('campaign.export.all');
 
-    Route::get('/campaigns/export/all', [CampaignController::class, 'exportAllTest']);
+    Route::get('/campaigns/background/export/all', [CampaignController::class, 'backgroundExportAll'])
+        ->name('campaign.background.export.all');;
 
     Route::group([
         'prefix' => 'campaign'
     ], function () {
+        Route::get('/{campaign}/view', [CampaignController::class, 'view'])
+            ->name('view');
+
         Route::get('/create', [CampaignController::class, 'create'])
             ->name('create');
 
@@ -44,10 +48,14 @@ Route::group([
         Route::get('/{campaign}/export', [CampaignController::class, 'export'])
             ->name('export');
         
-        Route::get('/{campaign}/exporttest', [CampaignController::class, 'exportTestCamp'])
-            ->name('exporttest');
+        Route::get('/{campaign}/background/export', [CampaignController::class, 'backgroundExport'])
+            ->name('background.export');
 
         Route::get('/{campaign}/keyword', [CampaignController::class, 'getCampaignKeywords'])
             ->name('keyword');
+
+        Route::get('/report/{token}', [CampaignController::class, 'downloadReport'])
+            ->withoutMiddleware(['permission:access_campaigns', 'auth:sanctum', 'verified'])
+            ->name('report');
     });
 });

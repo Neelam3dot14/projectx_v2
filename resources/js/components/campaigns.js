@@ -59,7 +59,7 @@ export default {
         return await client.get(`campaign/${id}/reactivate`);
     },
 
-    // Execute Specific Campaign
+    // Export Specific Campaign
     async export(id) {
         return await client.get(`campaign/${id}/export`, {timeout: 80000});
         // return await client.options(`campaign/${id}/export`, {
@@ -68,21 +68,21 @@ export default {
         // })
     },
 
-    // Execute Specific Campaign
+    // Export All Campaign
     async exportAll() {
         return await client.get(`campaigns/export`, {
             timeout: 80000
         });
     },
 
-    // Execute Specific Campaign
-    async exportTest(id) {
-        return await client.get(`campaign/${id}/exporttest`);
+    // Export Specific Campaign in Background
+    async backgroundExport(id) {
+        return await client.get(`campaign/${id}/background/export`);
     },
 
-    // Execute Specific Campaign
-    async exportAllTest() {
-        return await client.get(`campaigns/export/all`, {
+    // Export All Campaign in Background
+    async backgroundExportAll() {
+        return await client.get(`campaigns/background/export/all`, {
             timeout: 80000
         });
     },

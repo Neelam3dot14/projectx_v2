@@ -14,6 +14,7 @@
                         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">New Campaign</button>
                     </inertia-link>
                     <button @click.prevent="onExportAll($event)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3 ml-4">Export All</button>
+                    <button @click.prevent="onBackgroundExportAll($event)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3 ml-4">Background Export All</button>
                     
                     <!--table-->
                                 <table class="min-w-full divide-y divide-gray-200">
@@ -39,6 +40,15 @@
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Execution Interval
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Revision Count
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Ad Competitions
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Ad Hijacks
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Status
@@ -72,6 +82,15 @@
                                                 <div class="text-sm text-gray-900">{{ campaign.execution_interval }}</div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-900">{{ campaign.alert_revisions_count }}</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-900">{{ campaign.ad_competitors_count }}</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-900">{{ campaign.ad_hijacks_count }}</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                     {{ campaign.status }}
                                                 </span>
@@ -89,7 +108,7 @@
       <MenuItems class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
         <div class="py-1">
           <MenuItem v-slot="{ active }">
-            <a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">View</a>
+            <a :href="route('internal.campaign.view', [ campaign.id ])" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">View</a>
           </MenuItem>
           <MenuItem v-slot="{ active }">
             <a @click.prevent="edit(campaign.id)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Edit</a>
@@ -110,7 +129,7 @@
             <a @click.prevent="onExport(campaign.id)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Export</a>
           </MenuItem>
            <MenuItem v-slot="{ active }">
-            <a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Background Export</a>
+            <a @click.prevent="onBackgroundExport(id, $event)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Background Export</a>
           </MenuItem>
         </div>
       </MenuItems>
@@ -256,6 +275,25 @@
                             errorMessage += "  "+e.response.data.errors[error];
                         }
                         this.message += ""+errorMessage;
+                    }
+                }
+            },
+            async onBackgroundExport(id, $event) {
+                try{
+                    let response = await api.backgroundExport(id);
+                    this.message = response.data.msg;
+                } catch(e) {
+                    console.log(e);
+                }
+            },
+            async onBackgroundExportAll($event) {
+                try{
+                    let response = await api.backgroundExportAll();
+                    this.message = response.data.msg;
+                } catch(e) {
+                    console.log(e);
+                    if(e.response && e.response.data) {
+                        this.message = e.response.data.message || 'There was an issue generating Report.';
                     }
                 }
             },

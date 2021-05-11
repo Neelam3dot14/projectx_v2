@@ -9,6 +9,9 @@ use App\Models\Internal\Campaign;
 use App\Events\CampaignKeywordGroupEvents;
 use App\Repositories\CampaignRepository;
 use App\Http\Resources\ViewCampaignResource;
+use App\Http\Resources\CampaignResource;
+use App\Models\Internal\ExportNotification;
+use App\Events\CampaignExportEvents;
 
 class CampaignController extends Controller
 {
@@ -16,8 +19,30 @@ class CampaignController extends Controller
 
     public function index()
     {
-        $campaigns = Campaign::all();
-        return Inertia::render('Internal/Campaigns/CampaignIndex', ['campaigns' => $campaigns]);
+        return Inertia::render('Internal/Campaigns/CampaignIndex', [
+            'campaigns' => Campaign::where('created_by',\Auth::id())
+                            ->withCount('alertRevisions','adCompetitors', 'adHijacks')->get()
+                            ->map(function ($camp) {
+                return [
+                    'id' => $camp->id,
+                    'name' => $camp->name,
+                    'keywords' => $camp->keywords,
+                    'device' => $camp->device,
+                    'search_engine' => $camp->search_engine,
+                    'execution_type' => $camp->execution_type,
+                    'execution_interval' => $camp->execution_interval,
+                    'country' => $camp->country,
+                    'canonical_states' => isset($camp->canonical_states) ? $camp->canonical_states : 'none',
+                    'gl_code' => $camp->gl_code,
+                    'google_domain' => $camp->google_domain,
+                    'created_by' => $camp->created_by,
+                    'status' => $camp->status,
+                    'alert_revisions_count' => $camp->alert_revisions_count,
+                    'ad_competitors_count' => $camp->ad_competitors_count,
+                    'ad_hijacks_count' => $camp->ad_hijacks_count,
+                ];
+            }),
+        ]);
     }
 
     public function create()
@@ -313,6 +338,114 @@ class CampaignController extends Controller
         $callback = $this->campaignRepo->exportAllCampaign($user_id);
         return response()->stream($callback, 200, $headers);
     }
+
+    public function backgroundExport($campaign_id)
+    {
+        $current_time = \Carbon\Carbon::now()->timestamp;
+        $fileName = \Auth::id().'export'.$campaign_id;
+        $file_hash = str_replace ('/', '',\Hash::make($fileName));
+        $exportData = [
+            'user_id' => \Auth::id(),
+            'campaign_id' => $campaign_id,
+            'filename' => $fileName,
+            'file_hash' => $file_hash,
+            'hash' => str_replace ('/', '', \Hash::make($current_time)),
+        ];
+        $exportNotification = ExportNotification::create($exportData);
+        event(CampaignExportEvents::CAMPAIGN_EXPORT, new CampaignExportEvents($exportNotification));
+        if($exportNotification){
+            $response = [
+                'msg' => 'Report is generating in background!! Please Check Mail for Notification'
+            ];
+        }
+        else{
+            $response = [
+                'error' => 'Notification Faces Issue'
+            ];
+        }
+
+        return response($response, 201);
+    }
+
+    public function backgroundExportAll()
+    {
+        $current_time = \Carbon\Carbon::now()->timestamp;
+        $fileName = \Auth::id().'export0';
+        $file_hash = str_replace ('/', '',\Hash::make($fileName));
+        $exportData = [
+            'user_id' => \Auth::id(),
+            'campaign_id' => '0',
+            'filename' => $fileName,
+            'file_hash' => $file_hash,
+            'hash' => str_replace ('/', '', \Hash::make($current_time)),
+        ];
+        $exportNotification = ExportNotification::create($exportData);
+        event(CampaignExportEvents::CAMPAIGN_EXPORT_ALL, new CampaignExportEvents($exportNotification));
+        if($exportNotification){
+            $response = [
+                'msg' => 'Report is generating in background!! Please Check Mail for Notification'
+            ];
+        }
+        else{
+            $response = [
+                'error' => 'Notification Facing Issue'
+            ];
+        }
+        return response($response, 201);
+    }
+
+    public function downloadReport($token)
+    {
+        $exportData = ExportNotification::where('hash', $token)->get();
+        $fileName = $exportData[0]->filename.'.csv';
+        $file =  public_path('export').'/'.$fileName;
+        if(file_exists($file))
+        {
+            $headers = array(
+                "Content-type"        => "text/csv",
+                "Content-Disposition" => "attachment; filename=report",
+                "Pragma"              => "no-cache",
+                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                "Expires"             => "0"
+            );
+            ExportNotification::where('hash', $token)->update(['status' => 'DOWNLOADED']);
+
+            return \Response::download( $file, 'report.csv', $headers);
+        } else {
+            return 'File does not exists';
+        }
+    }
+
+    public function view(Campaign $campaign)
+    {
+        $this->campaignRepo = new CampaignRepository();
+        $campaigns = $this->campaignRepo->view($campaign->id);
+
+        $campData = [
+            'id' => $campaigns[0]->id,
+            'name' => $campaigns[0]->name,
+            'keywords' => $campaigns[0]->keywords,
+            'device' => $campaigns[0]->device,
+            'search_engine' => $campaigns[0]->search_engine,
+            'crawler' => $campaigns[0]->crawler,
+            'execution_type' => $campaigns[0]->execution_type,
+            'execution_interval' => $campaigns[0]->execution_interval,
+            'country' => $campaigns[0]->country,
+            'states' => isset($campaigns[0]->canonical_states) ? $campaigns[0]->canonical_states : '',
+            'location' => $campaigns[0]->location,
+            'google_domain' => $campaigns[0]->google_domain,
+            'whitelisted_domain' => $campaigns[0]->whitelisted_domain,
+            'blacklisted_domain' => $campaigns[0]->blacklisted_domain,
+            'alert_revisions_count' => $campaigns[0]->alert_revisions_count,
+            'success_revisions_count' => $campaigns[0]->success_revisions_count,
+            'crawl_failed_revisions_count' => $campaigns[0]->crawl_failed_revisions_count,
+            'scraping_failed_revisions_count' => $campaigns[0]->scraping_failed_revisions_count,
+            'pending_revisions_count' => $campaigns[0]->pending_revisions_count,
+
+        ];
+        return Inertia::render('Internal/Campaigns/CampaignView', [ 'campaign' => $campData ]);
+    }
+
 
 
 

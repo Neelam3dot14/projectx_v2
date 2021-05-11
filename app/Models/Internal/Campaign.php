@@ -50,4 +50,14 @@ class Campaign extends Model
     {
         return $this->hasManyThrough(AlertRevision::class, CampaignKeyword::class, 'campaign_id', 'keyword_id');
     }
+
+    public function adCompetitors()
+    {
+        return $this->hasMany(AdCompetition::class);
+    }
+
+    public function adHijacks()
+    {
+        return $this->hasMany(AdHijack::class);
+    }
 }

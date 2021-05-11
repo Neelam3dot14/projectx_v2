@@ -19,11 +19,11 @@ use App\Jobs\Internal\AdsCompetition;
 class CampaignRepository
 {
     protected $geotargetRepo;
-    public function getCampaigns($paginate = 50)
+    public function getCampaigns()
     {
-        $result = Campaign::where('created_by',\Auth::id())   //where clause for created_by current user only
-                    ->withCount('alertRevisions','adCompetitors', 'adHijacks')
-                    ->paginate($paginate);
+        $result = Campaign:://where('created_by',\Auth::id())   //where clause for created_by current user only
+                    withCount('alertRevisions','adCompetitors', 'adHijacks')->get();
+                    //->paginate($paginate);
         return $result;
     }
 
@@ -37,7 +37,7 @@ class CampaignRepository
     public function view($campaign_id)
     {
         $result = Campaign::where('id', $campaign_id)
-            /*->withCount(['alertRevisions', 'alertRevisions as success_revisions_count' => function ($query) {
+            ->withCount(['alertRevisions', 'alertRevisions as success_revisions_count' => function ($query) {
                 $query->where('status', '=', 'TRACED');
             }, 'alertRevisions as crawl_failed_revisions_count' => function ($query) {
                 $query->where('status', '=', 'CRAWL_FAILED');
@@ -45,7 +45,7 @@ class CampaignRepository
                 $query->where('status', '=', 'SCRAPING_FAILED');
             }, 'alertRevisions as pending_revisions_count' => function ($query) {
                 $query->where('status', '=', 'PENDING');
-            }])*/
+            }])
             ->get();
         return $result;
     }

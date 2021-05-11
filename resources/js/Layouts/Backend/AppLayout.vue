@@ -29,6 +29,9 @@
                                 <jet-nav-link :href="route('backend.permission.list')" :active="route().current('backend.permission.list')">
                                     Permissions
                                 </jet-nav-link>
+                                <jet-nav-link :href="route('internal.campaign.list')" :active="route().current('internal.campaign.list')">
+                                    Campaigns
+                                </jet-nav-link>
                             </div>
                         </div>
 
