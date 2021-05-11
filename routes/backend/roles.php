@@ -4,7 +4,7 @@ use App\Http\Controllers\Backend\User\RoleController;
 
 Route::group([
     'prefix' => 'role',
-//'middleware' => ['permission:access_role_management']
+    'middleware' => ['permission:access_role_management']
 ], function () {
     Route::get('/list', [RoleController::class, 'index'])->name('role.list');
     Route::post('/create', [RoleController::class, 'store'])->name('role.create');

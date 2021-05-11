@@ -6,7 +6,7 @@ use App\Http\Controllers\Internal\CampaignController;
 Route::group([
     'namespace' => 'Campaign',
     'as' => 'campaign.',
-    //'middleware' => ['jwt.verify', 'permission:access_campaigns']
+    'middleware' => ['permission:access_campaigns']
 ], function () {
     Route::get('/campaigns', [CampaignController::class, 'index'])->name('list');
 

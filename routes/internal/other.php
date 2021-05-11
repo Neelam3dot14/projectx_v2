@@ -7,7 +7,7 @@ Route::group([
     'namespace' => 'Geotarget',
     'as' => 'geotarget.',
     'prefix' => 'geotargets',
-    //'middleware' => ['jwt.verify', 'permission:access_campaigns']
+    'middleware' => ['permission:access_campaigns']
 ], function () {
     Route::post('/default', [GeoTargetController::class, 'getGeoTargetByCountryCode'])
     ->name('default');

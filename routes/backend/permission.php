@@ -4,7 +4,7 @@ use App\Http\Controllers\Backend\User\PermissionController;
 
 Route::group([
     'prefix' => 'permission',
-    //'middleware' => ['permission:access_permission_management']
+    'middleware' => ['permission:access_permission_management']
 ], function () {
     Route::get('/list', [PermissionController::class, 'index'])->name('permission.list');
     Route::post('/create', [PermissionController::class, 'store'])->name('permission.create');
