@@ -7,7 +7,7 @@
         </template>
 
         <div class="py-12">
-            <div class="max-w-8xl mx-auto sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div v-if=message>{{ message }}</div>
                 <div class="bg-white shadow-xl sm:rounded-lg">
                     <inertia-link :href="route('internal.campaign.create')">
@@ -86,10 +86,19 @@
                                                 <div class="text-sm text-gray-900">{{ campaign.alert_revisions_count }}</div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-gray-900">{{ campaign.ad_competitors_count }}</div>
+                                                <div class="text-sm text-gray-900">
+                                                    <a @click.prevent="onViewAdCompetitorCount(campaign.id, $event)">
+                                                        {{ campaign.ad_competitors_count }}
+                                                        <LinkIcon class="h-5 w-5 text-blue-500"/>
+                                                    </a>
+                                                </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-gray-900">{{ campaign.ad_hijacks_count }}</div>
+                                                <div class="text-sm text-gray-900">
+                                                    <a @click.prevent="onViewAdHijackCount(campaign.id, $event)">
+                                                        {{ campaign.ad_hijacks_count }} <LinkIcon class="h-5 w-5 text-blue-500"/>
+                                                    </a>
+                                                </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
@@ -97,7 +106,7 @@
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-  <Menu as="div" class="relative inline-block text-left">
+    <Menu as="div" class="relative inline-block text-left">
     <div>
       <MenuButton class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500">
         Actions
@@ -152,7 +161,7 @@
 <script>
     import InternalLayout from '@/Layouts/Internal/AppLayout'
     import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
-    import { ChevronDownIcon } from '@heroicons/vue/solid'
+    import { ChevronDownIcon, LinkIcon } from '@heroicons/vue/solid'
     import api from "../../../components/campaigns";
 
     export default {
@@ -163,6 +172,7 @@
             MenuItem,
             MenuItems,
             ChevronDownIcon,
+            LinkIcon,
         },
         props: ['campaigns'],
         data() {
@@ -300,6 +310,14 @@
             },
             async onView(campaign_id, $event){
                 this.$inertia.get(route('internal.campaign.view', campaign_id));
+            },
+
+            async onViewAdCompetitorCount(campaign_id, $event){
+                this.$inertia.get(route('internal.ads.competitor', campaign_id));
+            },
+
+            async onViewAdHijackCount(campaign_id, $event){
+                this.$inertia.get(route('internal.ads.hijack', campaign_id));
             },
         }
     }

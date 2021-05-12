@@ -441,10 +441,16 @@ class CampaignController extends Controller
             'crawl_failed_revisions_count' => $campaigns[0]->crawl_failed_revisions_count,
             'scraping_failed_revisions_count' => $campaigns[0]->scraping_failed_revisions_count,
             'pending_revisions_count' => $campaigns[0]->pending_revisions_count,
-
         ];
         return Inertia::render('Internal/Campaigns/CampaignView', [ 'campaign' => $campData ]);
     }
+
+    public function getCampaignKeywords($campaign_id)
+    {
+        $this->campaignRepo = new CampaignRepository();
+        return $this->campaignRepo->getKeywordGroup($campaign_id);
+    }
+
 
 
 
