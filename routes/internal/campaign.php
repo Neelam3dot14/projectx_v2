@@ -55,7 +55,7 @@ Route::group([
             ->name('keyword');
 
         Route::get('/report/{token}', [CampaignController::class, 'downloadReport'])
-            ->withoutMiddleware(['permission:access_campaigns', 'auth:sanctum', 'verified'])
+            ->withoutMiddleware(['auth:sanctum', 'verified', 'permission:view_internal', 'permission:access_campaigns'])
             ->name('report');
     });
 });

@@ -70,4 +70,18 @@ class RoleController extends Controller
         return $result;
     }
 
+    public function checkRole()
+    {
+        $user = \Auth::user();
+
+        if($user === null){ return false; }
+
+        $isAdmin = $user->hasAnyRole([
+            "Super_administrator",
+            "Administrator",
+        ]);
+
+        return $isAdmin;
+    }
+
 }

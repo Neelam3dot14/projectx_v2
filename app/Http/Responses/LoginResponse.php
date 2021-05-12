@@ -28,7 +28,7 @@ class LoginResponse implements LoginResponseContract
         if ($check) {
             return redirect()->intended('/admin/dashboard');
         }
-        return redirect()->intended('/internal/dashboard');
+        return redirect()->intended(config('fortify.home'));
         /*switch ($role) {
             case 'admin':
                 return redirect()->intended(config('fortify.home'));

@@ -23,15 +23,15 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
+/*Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return Inertia::render('Dashboard');
-})->name('dashboard');
+})->name('dashboard');*/
 
 Route::group([
     'namespace' => 'Backend',
     'as' => 'backend.',
     'prefix' => 'admin',
-    'middleware' => ['auth:sanctum', 'verified']
+    'middleware' => ['auth:sanctum', 'verified', 'permission:view_backend']
 ], function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Backend/Dashboard');
@@ -41,11 +41,16 @@ Route::group([
 
 Route::group([
     'namespace' => 'Internal',
-    'as' => 'internal.',
-    'middleware' => ['auth:sanctum', 'verified']
+    'middleware' => ['auth:sanctum', 'verified', 'permission:view_internal']
 ], function () {
-    Route::get('/internal/dashboard', function () {
+
+    Route::get('/dashboard', function () {
         return Inertia::render('Internal/Dashboard');
     })->name('dashboard');
-    includeRouteFiles(__DIR__.'/internal/');
+
+    Route::group([
+        'as' => 'internal.',
+    ], function () {
+        includeRouteFiles(__DIR__.'/internal/');
+    });
 });

@@ -21,7 +21,7 @@ Route::group([
         Route::get('/ads/{id}/trace', [KeywordAdsController::class, 'getAdTraces']);
 
         Route::get('/{alert_id}/html', [KeywordController::class, 'getKeywordHtml'])
-            ->withoutMiddleware(['permission:access_campaigns', 'auth:sanctum', 'verified'])
+            ->withoutMiddleware(['auth:sanctum', 'verified', 'permission:view_internal', 'permission:access_campaigns'])
             ->name('html');
     });
 });
