@@ -7,7 +7,7 @@
         </template>
 
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="max-w-8xl mx-auto sm:px-6 lg:px-8">
                 <div v-if=message>{{ message }}</div>
                 <div class="bg-white shadow-xl sm:rounded-lg">
                     <inertia-link :href="route('internal.campaign.create')">
@@ -15,9 +15,10 @@
                     </inertia-link>
                     <button @click.prevent="onExportAll($event)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3 ml-4">Export All</button>
                     <button @click.prevent="onBackgroundExportAll($event)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3 ml-4">Background Export All</button>
-                    
+                    <div class="flex items-center">
+                        <div class='overflow-x-auto w-full'>
                     <!--table-->
-                                <table class="min-w-full divide-y divide-gray-200">
+                               <table class='mx-auto max-w-4xl w-full whitespace-nowrap rounded-lg bg-white divide-y divide-gray-300'>
                                     <thead class="bg-gray-50">
                                     <tr>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -108,7 +109,7 @@
       <MenuItems class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
         <div class="py-1">
           <MenuItem v-slot="{ active }">
-            <a :href="route('internal.campaign.view', [ campaign.id ])" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">View</a>
+            <a @click.prevent="onView(campaign.id)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">View</a>
           </MenuItem>
           <MenuItem v-slot="{ active }">
             <a @click.prevent="edit(campaign.id)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">Edit</a>
@@ -140,7 +141,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                           
+                           </div></div>
                     <!--end of table-->
                 </div>
             </div>
@@ -296,6 +297,9 @@
                         this.message = e.response.data.message || 'There was an issue generating Report.';
                     }
                 }
+            },
+            async onView(campaign_id, $event){
+                this.$inertia.get(route('internal.campaign.view', campaign_id));
             },
         }
     }
