@@ -63,7 +63,6 @@ class CampaignController extends Controller
             'blacklisted_domain' => 'nullable',
             'whitelisted_domain' => 'nullable',
         ]);
-
         if (isset($data['whitelisted_domain'])){
             $whitelisted_domains = explode(PHP_EOL, $data['whitelisted_domain']);
             $whitelisted_domains = implode(",", array_filter($whitelisted_domains));
@@ -148,16 +147,17 @@ class CampaignController extends Controller
         } else {
             $blacklisted_domains = '';
         }
+        $crawler = ($campaigns[0]->crawler != 'random') ? explode(",", $campaigns[0]->crawler) : '';
         $campData = [
             'id' => $campaigns[0]->id,
             'name' => $campaigns[0]->name,
             'keywords' => $campaigns[0]->keywords,
             'device' => explode(",", $campaigns[0]->device),
-            'search_engine' => explode(",", $campaigns[0]->searchEngine),
-            'crawler' => $campaigns[0]->crawler,
+            'search_engine' => explode(",", $campaigns[0]->search_engine),
+            'crawler' => $crawler,
             'execution_interval' => $campaigns[0]->execution_interval,
             'country' => explode(",", $campaigns[0]->country),
-            'states' => isset($campaigns[0]->canonical_states) ? explode(",", $campaigns[0]->canonical_states) : '',
+            'states' => isset($campaigns[0]->canonical_states) ? explode(",", $campaigns[0]->canonical_states) : [],
             'country_location' => $campaigns[0]->location,
             'state_location' => isset($campaigns[0]->canonical_states) ? $campaigns[0]->location : '',
             'location' => $campaigns[0]->location,
@@ -180,7 +180,6 @@ class CampaignController extends Controller
             'whitelisted_domain'  => 'nullable',
             'blacklisted_domain' => 'nullable',
         ]);
-        
         if(!empty($data['states'])){
             foreach($data['states'] as $v){
                 $canonical_states[] = $v['canonical_states'];

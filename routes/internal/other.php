@@ -9,11 +9,11 @@ Route::group([
     'prefix' => 'geotargets',
     'middleware' => ['permission:access_campaigns']
 ], function () {
-    Route::post('/default', [GeoTargetController::class, 'getGeoTargetByCountryCode'])
-    ->name('default');
+    Route::post('/statelist/default', [GeoTargetController::class, 'getGeoTargetByCountryCode'])
+    ->name('state.list.default');
 
-    Route::post('/search', [GeoTargetController::class, 'geoTargetSearch'])
-    ->name('search');
+    Route::post('/state/search', [GeoTargetController::class, 'geoTargetSearch'])
+    ->name('state.search');
 
     Route::get('/countrylist', [GeoTargetController::class, 'getCountryList'])
     ->name('country.list');

@@ -19,11 +19,11 @@ const client = axios.create({
 client.defaults.timeout = 4000;
 
 export default {
-    async search(data) {
-        return await client.post('geotargets/search', data, {timeout: 8000});
+    async searchStateByCountryCode(data) {
+        return await client.post('geotargets/state/search', data, {timeout: 8000});
     },
-    async getDefaultValue(data) {
-        return await client.post('geotargets/default', data, {timeout: 8000});
+    async getDefaultStateList(data) {
+        return await client.post('geotargets/statelist/default', data, {timeout: 8000});
     },
     async getCountryList() {
         return await client.get('geotargets/countrylist', {timeout: 20000});

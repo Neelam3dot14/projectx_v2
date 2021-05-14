@@ -19,9 +19,13 @@ class CountryResource extends JsonResource
         $google_domain = $geotargetRepo->getGoogleDomain($this->country_code);
         
         return [
+            'value' => [
+                'country_code' => $this->country_code,
+                'canonical_country' => $this->canonical_country,
+                'google_domain' => $google_domain
+                ],
             'country_code' => $this->country_code,
             'canonical_country' => $this->canonical_country,
-            'google_domain' => $google_domain,
         ];
     }
 }

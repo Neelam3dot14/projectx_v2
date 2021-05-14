@@ -26,6 +26,9 @@ Route::get('/', function () {
 /*Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->name('dashboard');*/
+Route::middleware(['auth:sanctum', 'verified'])->get('/country', function () {
+    return Inertia::render('Internal/Campaigns/country');
+})->name('country');
 
 Route::group([
     'namespace' => 'Backend',

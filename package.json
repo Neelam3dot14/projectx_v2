@@ -28,6 +28,7 @@
     "dependencies": {
         "@headlessui/vue": "^1.1.1",
         "@heroicons/vue": "^1.0.1",
+        "@vueform/multiselect": "^1.4.0",
         "v-select2-component": "^0.4.7",
         "vue-multiselect": "^2.1.6"
     }

@@ -15,12 +15,15 @@ class GeotargetResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'canonical_country' => $this->canonical_country,
+            'value' => [
+                'id' => $this->id,
+                'canonical_country' => $this->canonical_country,
+                'country_code' => $this->country_code,
+                'canonical_states' => $this->canonical_states,
+                'google_domain' => $this->google_domain,
+                'uule_code' => $this->uule_code,
+            ],
             'canonical_states' => $this->canonical_states,
-            'country_code' => $this->country_code,
-            'google_domain' => $this->google_domain,
-            'uule_code' => $this->uule_code,
         ];
     }
 }

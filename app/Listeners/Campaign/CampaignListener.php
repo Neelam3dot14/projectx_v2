@@ -24,7 +24,7 @@ class CampaignListener implements ShouldQueue
             foreach($devices as $device){
                 foreach($searchEngines as $searchEngine){
                     $datetime = NULL;
-                    if($searchEngine == 'yahoo'){
+                    if(strtolower($searchEngine) == 'yahoo'){
                         $result = $this->geotargetRepo->checkYahooDomainByCountryCode(strtoupper($locationInfo['country_code']));
                         if(!$result){
                             $datetime = date('Y-m-d h:i:s');
@@ -37,7 +37,7 @@ class CampaignListener implements ShouldQueue
                         'keyword' => $this->keywordGroup->keyword,
                         'proxy_use' => 'default',
                         'device' => strtolower($device),
-                        'search_engine' => $searchEngine,
+                        'search_engine' => strtolower($searchEngine),
                         'country_code' => strtolower($locationInfo['country_code']),
                         'lang' => $language,
                         'google_domain' => $locationInfo['google_domain'],
