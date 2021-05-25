@@ -5,13 +5,16 @@ namespace App\Http\Controllers\Backend\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use App\Repositories\Backend\User\PermissionRepository;
 use Inertia\Inertia;
 
 class RoleController extends Controller
 {
+    public $permissionRepo;
     public function index()
     {
-        return Inertia::render('Backend/RoleList', [
+        return Inertia::render('Backend/Role/List', [
             'data' => Role::all()->map(function ($role) {
                 return [
                     'id' => $role->id,
@@ -25,31 +28,50 @@ class RoleController extends Controller
         return Inertia::render('Backend/RoleList', ['data' => $data]);*/
     }
 
+    public function create()
+    {
+        $this->permissionRepo = new PermissionRepository();
+        $permissions = $this->permissionRepo->getAllPermissionByName();
+        return Inertia::render('Backend/Role/Create', ['permission' => $permissions]);
+    }
+
     public function store(Request $request)
     {
         $this->validate($request, [
             'name' => 'required|unique:roles,name',
-            'permission' => 'required',
+            'permissions' => 'required',
         ]);
         $role = Role::create(['guard_name' => 'web', 'name' => $request->input('name')]);
-        $role->givePermissionTo($request->input('permission'));
+        $role->givePermissionTo($request->input('permissions'));
         return redirect()->route('backend.role.list')
                 ->with('message', 'Role Created Successfully.');
+    }
+
+    public function edit($id)
+    {
+        $this->permissionRepo = new PermissionRepository();
+        $permissions = $this->permissionRepo->getAllPermissionByName();
+        $role = Role::findOrFail($id);
+        $roleResource = [
+            'id' => $role->id,
+            'name' => $role->name,
+            'permissions' => $role->permissions()->pluck('name'),
+        ];
+        return Inertia::render('Backend/Role/Edit', ['permission' => $permissions, 'role' => $roleResource ]);
     }
 
     public function update(Request $request, $id)
     {   
         $this->validate($request, [
             'name' => 'required',
-            'permission' => 'required',
+            'permissions' => 'required',
         ]);
-
         $role = Role::find($id);
         $role->name = $request->input('name');
         $role->save();
-        $permission = $request->input('permission');
-        $role->syncPermissions($permission);
-        return redirect()->back()
+        $permissions = $request->input('permissions');
+        $role->syncPermissions($permissions);
+        return redirect()->route('backend.role.list')
                 ->with('message', 'Role Updated Successfully.');
     }
 

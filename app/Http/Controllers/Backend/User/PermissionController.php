@@ -7,16 +7,30 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Repositories\Backend\User\PermissionRepository;
-use App\Http\Resources\Backend\User\PermissionResource;
 use Inertia\Inertia;
 
 class PermissionController extends Controller
 {
     public $permissionRepo;
-    public function index() {
+    public function index()
+    {
         $this->permissionRepo = new PermissionRepository();
-        $permission = $this->permissionRepo->getAllPermissions();
-        return Inertia::render('Backend/PermissionList', ['permission' => $permission]);
+        $permissions = $this->permissionRepo->getAllPermissions();
+        //return Inertia::render('Backend/PermissionList', ['permission' => $permission]);
+        return Inertia::render('Backend/Permission/List', [
+            'permission' => $permissions->map(function ($permission) {
+                return [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                    'created_at' => date('d-m-Y h:i:s', strtotime($permission->created_at)),
+                ];
+            }),
+        ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('Backend/Permission/Create');
     }
 
     public function store(Request $request) 
@@ -26,8 +40,14 @@ class PermissionController extends Controller
         ]);
         $name = $request['name'];
         $permission = Permission::create(['guard_name' => 'web', 'name' => $name ]);
-        return redirect()->back()
+        return redirect()->route('backend.permission.list')
                 ->with('message', 'Permission Created Successfully.');
+    }
+
+    public function edit($id)
+    {
+        $permission = Permission::findOrFail($id);
+        return Inertia::render('Backend/Permission/Edit', ['permission' => $permission]);
     }
 
     public function update(Request $request, $id)
@@ -38,16 +58,15 @@ class PermissionController extends Controller
         $permission = Permission::findOrFail($id);
         $input = $request->all();
         $permission->fill($input)->save();
-        return new PermissionResource($permission);
+        return redirect()->route('backend.permission.list')
+                ->with('message', 'Permission Updated Successfully.');
     }
 
-    public function destroy(Request $request)
+    public function destroy($id)
     {
-        if ($request->has('id')) {
-            Permission::find($request->input('id'))->delete();
-            return redirect()->back()
+        Permission::find($id)->delete();
+        return redirect()->route('backend.permission.list')
                 ->with('message', 'Permission Deleted Successfully.');
-        }
     }
 
     public function getAllPermissionByName()
@@ -58,6 +77,5 @@ class PermissionController extends Controller
             array_push($permission, $data['name']);
         }
         return $permission;
-        //return $result;
     }
 }
