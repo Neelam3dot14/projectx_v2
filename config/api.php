@@ -64,5 +64,4 @@ return [
             'bing.com',
         ],
     ],
-    'test' => 'fork again push testing',
 ];
